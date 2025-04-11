@@ -1,7 +1,7 @@
 {
   "name": "react-native-range-slider",
   "version": "0.1.0",
-  "description": "123123",
+  "description": "A high-performance React Native range slider with smooth animations and precise touch controls using react-native-reanimated",
   "source": "./src/index.tsx",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
@@ -43,7 +43,15 @@
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "range-slider",
+    "slider",
+    "range",
+    "reanimated",
+    "gesture-handler",
+    "performance",
+    "touch",
+    "interactive"
   ],
   "repository": {
     "type": "git",
@@ -57,6 +65,17 @@
   "homepage": "https://github.com/amitpdev/react-native-range-slider#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "react-native-gesture-handler": "^2.15.0",
+    "react-native-reanimated": "^3.8.0",
+    "prop-types": "^15.8.1"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-gesture-handler": ">=2.0.0",
+    "react-native-reanimated": ">=3.0.0"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^19.6.0",
@@ -80,10 +99,6 @@
     "react-native-builder-bob": "^0.40.5",
     "release-it": "^17.10.0",
     "typescript": "^5.2.2"
-  },
-  "peerDependencies": {
-    "react": "*",
-    "react-native": "*"
   },
   "workspaces": [
     "example"

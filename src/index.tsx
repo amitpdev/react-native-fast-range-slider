@@ -1,3 +1,3 @@
-export function multiply(a: number, b: number): number {
-  return a * b;
-}
+export { default } from './RangeSlider';
+import type { RangeSliderProps } from './types';
+export type { RangeSliderProps };
