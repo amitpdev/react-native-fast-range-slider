@@ -16,18 +16,18 @@ import PropTypes from 'prop-types';
 // Layout constants
 const HORIZONTAL_PADDING = 15;
 const TOUCH_HITSLOP = { top: 20, bottom: 20, left: 20, right: 20 };
-const MIN_MARKER_SPACING = 16;
+const MIN_THUMB_SPACING = 16;
 
 // Default values constants
 const DEFAULT_VALUES = {
   SLIDER_WIDTH: 270,
-  MARKER_SIZE: 32,
+  THUMB_SIZE: 32,
   TRACK_HEIGHT: 2.5,
   STEP: 1,
-  LEFT_MARKER_LABEL: 'Left handle',
-  RIGHT_MARKER_LABEL: 'Right handle',
-  MINIMUM_DISTANCE: MIN_MARKER_SPACING,
-  SHOW_MARKER_LINES: true,
+  LEFT_THUMB_LABEL: 'Left handle',
+  RIGHT_THUMB_LABEL: 'Right handle',
+  MINIMUM_DISTANCE: MIN_THUMB_SPACING,
+  SHOW_THUMB_LINES: true,
 };
 
 const createDynamicStyles = (props) => ({
@@ -45,10 +45,10 @@ const createDynamicStyles = (props) => ({
     position: 'absolute',
     height: props.trackHeight,
   },
-  marker: {
-    height: props.markerSize,
-    width: props.markerSize,
-    borderRadius: props.markerSize / 2,
+  thumb: {
+    height: props.thumbSize,
+    width: props.thumbSize,
+    borderRadius: props.thumbSize / 2,
     backgroundColor: 'white', // Move default color here
     position: 'absolute',
     shadowColor: '#000',
@@ -58,7 +58,7 @@ const createDynamicStyles = (props) => ({
     elevation: 5,
     left: 0,
     top: '50%',
-    marginTop: -(props.markerSize / 2),
+    marginTop: -(props.thumbSize / 2),
     borderWidth: 0.5,
     borderColor: '#CECECE',
     justifyContent: 'center',
@@ -80,13 +80,13 @@ const RangeSlider = forwardRef(
       // Style props
       selectedTrackStyle,
       unselectedTrackStyle,
-      markerStyle,
-      pressedMarkerStyle,
+      thumbStyle,
+      pressedThumbStyle,
       containerStyle,
 
       // Customization props
       sliderWidth = DEFAULT_VALUES.SLIDER_WIDTH,
-      markerSize = DEFAULT_VALUES.MARKER_SIZE,
+      thumbSize = DEFAULT_VALUES.THUMB_SIZE,
       trackHeight = DEFAULT_VALUES.TRACK_HEIGHT,
       minimumDistance = DEFAULT_VALUES.MINIMUM_DISTANCE,
 
@@ -100,11 +100,11 @@ const RangeSlider = forwardRef(
       onValuesChangeStart = () => {},
 
       // Accessibility props
-      leftMarkerAccessibilityLabel = DEFAULT_VALUES.LEFT_MARKER_LABEL,
-      rightMarkerAccessibilityLabel = DEFAULT_VALUES.RIGHT_MARKER_LABEL,
+      leftThumbAccessibilityLabel = DEFAULT_VALUES.LEFT_THUMB_LABEL,
+      rightThumbAccessibilityLabel = DEFAULT_VALUES.RIGHT_THUMB_LABEL,
 
-      // Marker lines prop
-      showMarkerLines = DEFAULT_VALUES.SHOW_MARKER_LINES,
+      // Visual props
+      showThumbLines = DEFAULT_VALUES.SHOW_THUMB_LINES,
     },
     ref
   ) => {
@@ -152,11 +152,11 @@ const RangeSlider = forwardRef(
       };
     });
 
-    const leftMarkerStyle = useAnimatedStyle(() => ({
+    const leftThumbStyle = useAnimatedStyle(() => ({
       transform: leftTransform.value,
     }));
 
-    const rightMarkerStyle = useAnimatedStyle(() => ({
+    const rightThumbStyle = useAnimatedStyle(() => ({
       transform: rightTransform.value,
     }));
 
@@ -284,7 +284,7 @@ const RangeSlider = forwardRef(
 
     const dynamicStyles = createDynamicStyles({
       sliderWidth,
-      markerSize,
+      thumbSize,
       trackHeight,
       enabled,
     });
@@ -321,17 +321,17 @@ const RangeSlider = forwardRef(
           >
             <Animated.View
               accessible={true}
-              accessibilityLabel={leftMarkerAccessibilityLabel}
+              accessibilityLabel={leftThumbAccessibilityLabel}
               accessibilityRole="adjustable"
               style={[
-                dynamicStyles.marker,
+                dynamicStyles.thumb,
                 styles.markerContainer,
-                markerStyle,
-                pressed.left && pressedMarkerStyle,
-                leftMarkerStyle,
+                thumbStyle,
+                pressed.left && pressedThumbStyle,
+                leftThumbStyle,
               ]}
             >
-              {showMarkerLines && (
+              {showThumbLines && (
                 <>
                   <View style={staticStyles.markerLine} />
                   <View style={staticStyles.markerLine} />
@@ -349,17 +349,17 @@ const RangeSlider = forwardRef(
           >
             <Animated.View
               accessible={true}
-              accessibilityLabel={rightMarkerAccessibilityLabel}
+              accessibilityLabel={rightThumbAccessibilityLabel}
               accessibilityRole="adjustable"
               style={[
-                dynamicStyles.marker,
+                dynamicStyles.thumb,
                 styles.markerContainer,
-                markerStyle,
-                pressed.right && pressedMarkerStyle,
-                rightMarkerStyle,
+                thumbStyle,
+                pressed.right && pressedThumbStyle,
+                rightThumbStyle,
               ]}
             >
-              {showMarkerLines && (
+              {showThumbLines && (
                 <>
                   <View style={staticStyles.markerLine} />
                   <View style={staticStyles.markerLine} />
@@ -411,13 +411,13 @@ RangeSlider.propTypes = {
   // Style props
   selectedTrackStyle: PropTypes.object,
   unselectedTrackStyle: PropTypes.object,
-  markerStyle: PropTypes.object,
-  pressedMarkerStyle: PropTypes.object,
+  thumbStyle: PropTypes.object,
+  pressedThumbStyle: PropTypes.object,
   containerStyle: PropTypes.object,
 
   // Customization props
   sliderWidth: PropTypes.number,
-  markerSize: PropTypes.number,
+  thumbSize: PropTypes.number,
   trackHeight: PropTypes.number,
   minimumDistance: PropTypes.number,
 
@@ -431,26 +431,26 @@ RangeSlider.propTypes = {
   onValuesChangeStart: PropTypes.func,
 
   // Accessibility props
-  leftMarkerAccessibilityLabel: PropTypes.string,
-  rightMarkerAccessibilityLabel: PropTypes.string,
+  leftThumbAccessibilityLabel: PropTypes.string,
+  rightThumbAccessibilityLabel: PropTypes.string,
 
-  // Marker lines prop
-  showMarkerLines: PropTypes.bool,
+  // Visual props
+  showThumbLines: PropTypes.bool,
 };
 
 RangeSlider.defaultProps = {
   step: DEFAULT_VALUES.STEP,
   sliderWidth: DEFAULT_VALUES.SLIDER_WIDTH,
-  markerSize: DEFAULT_VALUES.MARKER_SIZE,
+  thumbSize: DEFAULT_VALUES.THUMB_SIZE,
   trackHeight: DEFAULT_VALUES.TRACK_HEIGHT,
   enabled: true,
   allowOverlap: false,
   onValuesChange: () => {},
   onValuesChangeFinish: () => {},
   onValuesChangeStart: () => {},
-  leftMarkerAccessibilityLabel: DEFAULT_VALUES.LEFT_MARKER_LABEL,
-  rightMarkerAccessibilityLabel: DEFAULT_VALUES.RIGHT_MARKER_LABEL,
-  showMarkerLines: DEFAULT_VALUES.SHOW_MARKER_LINES,
+  leftThumbAccessibilityLabel: DEFAULT_VALUES.LEFT_THUMB_LABEL,
+  rightThumbAccessibilityLabel: DEFAULT_VALUES.RIGHT_THUMB_LABEL,
+  showThumbLines: DEFAULT_VALUES.SHOW_THUMB_LINES,
 };
 
 export default RangeSlider;

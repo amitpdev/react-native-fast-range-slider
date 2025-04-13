@@ -1,6 +1,6 @@
 # React Native Range Slider
 
-A high-performance React Native range slider component built with react-native-reanimated and react-native-gesture-handler for smooth animations and precise touch control.
+A high-performance React Native range slider component built with [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated) and [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler) for smooth animations and precise touch control.
 
 ## Features
 
@@ -83,22 +83,22 @@ const YourComponent = () => {
 | max | number | Yes | - | Maximum allowed value |
 | step | number | No | 1 | Step size for value changes |
 | sliderWidth | number | No | 270 | Width of the slider track |
-| markerSize | number | No | 32 | Size of marker handles |
+| thumbSize | number | No | 32 | Size of thumb handles |
 | trackHeight | number | No | 2.5 | Height of slider track |
-| minimumDistance | number | No | 16 | Minimum distance between markers |
+| minimumDistance | number | No | 16 | Minimum distance between thumbs |
 | enabled | boolean | No | true | Enable/disable slider |
-| allowOverlap | boolean | No | false | Allow markers to overlap |
-| showMarkerLines | boolean | No | true | Show marker lines inside handles |
+| allowOverlap | boolean | No | false | Allow thumbs to overlap |
+| showThumbLines | boolean | No | true | Show lines inside thumb handles |
 | selectedTrackStyle | object | No | - | Style object for selected track portion |
 | unselectedTrackStyle | object | No | - | Style object for unselected track portion |
-| markerStyle | object | No | - | Style object for both markers |
-| pressedMarkerStyle | object | No | - | Style applied when marker is pressed |
+| thumbStyle | object | No | - | Style object for both thumbs |
+| pressedThumbStyle | object | No | - | Style applied when thumb is pressed |
 | containerStyle | object | No | - | Style for the container view |
 | onValuesChange | function | No | () => {} | Called while dragging |
 | onValuesChangeStart | function | No | () => {} | Called when drag starts |
 | onValuesChangeFinish | function | No | () => {} | Called when drag ends |
-| leftMarkerAccessibilityLabel | string | No | "Left handle" | Accessibility label for left marker |
-| rightMarkerAccessibilityLabel | string | No | "Right handle" | Accessibility label for right marker |
+| leftThumbAccessibilityLabel | string | No | "Left handle" | Accessibility label for left thumb |
+| rightThumbAccessibilityLabel | string | No | "Right handle" | Accessibility label for right thumb |
 
 ## Styling
 

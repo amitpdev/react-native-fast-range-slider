@@ -67,9 +67,9 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
+    "prop-types": "^15.8.1",
     "react-native-gesture-handler": "^2.15.0",
-    "react-native-reanimated": "^3.8.0",
-    "prop-types": "^15.8.1"
+    "react-native-reanimated": "^3.8.0"
   },
   "peerDependencies": {
     "react": "*",
