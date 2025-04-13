@@ -24,12 +24,10 @@ const DEFAULT_VALUES = {
   MARKER_SIZE: 32,
   TRACK_HEIGHT: 2.5,
   STEP: 1,
-  MARKER_COLOR: 'white',
-  SELECTED_TRACK_COLOR: '#2196F3',
-  UNSELECTED_TRACK_COLOR: '#CECECE',
   LEFT_MARKER_LABEL: 'Left handle',
   RIGHT_MARKER_LABEL: 'Right handle',
   MINIMUM_DISTANCE: MIN_MARKER_SPACING,
+  SHOW_MARKER_LINES: true,
 };
 
 const createDynamicStyles = (props) => ({
@@ -40,20 +38,18 @@ const createDynamicStyles = (props) => ({
   track: {
     position: 'absolute',
     height: props.trackHeight,
-    backgroundColor: props.unselectedTrackColor,
     width: props.sliderWidth,
     left: HORIZONTAL_PADDING,
   },
   selectedTrack: {
     position: 'absolute',
     height: props.trackHeight,
-    backgroundColor: props.selectedTrackColor,
   },
   marker: {
     height: props.markerSize,
     width: props.markerSize,
     borderRadius: props.markerSize / 2,
-    backgroundColor: props.markerColor,
+    backgroundColor: 'white', // Move default color here
     position: 'absolute',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -82,8 +78,8 @@ const RangeSlider = forwardRef(
       step = DEFAULT_VALUES.STEP,
 
       // Style props
-      selectedStyle,
-      unselectedStyle,
+      selectedTrackStyle,
+      unselectedTrackStyle,
       markerStyle,
       pressedMarkerStyle,
       containerStyle,
@@ -93,13 +89,9 @@ const RangeSlider = forwardRef(
       markerSize = DEFAULT_VALUES.MARKER_SIZE,
       trackHeight = DEFAULT_VALUES.TRACK_HEIGHT,
       minimumDistance = DEFAULT_VALUES.MINIMUM_DISTANCE,
-      markerColor = DEFAULT_VALUES.MARKER_COLOR,
-      selectedTrackColor = DEFAULT_VALUES.SELECTED_TRACK_COLOR,
-      unselectedTrackColor = DEFAULT_VALUES.UNSELECTED_TRACK_COLOR,
 
       // Behavior props
       enabled = true,
-      snapsToStep = false,
       allowOverlap = false,
 
       // Callback props
@@ -110,6 +102,9 @@ const RangeSlider = forwardRef(
       // Accessibility props
       leftMarkerAccessibilityLabel = DEFAULT_VALUES.LEFT_MARKER_LABEL,
       rightMarkerAccessibilityLabel = DEFAULT_VALUES.RIGHT_MARKER_LABEL,
+
+      // Marker lines prop
+      showMarkerLines = DEFAULT_VALUES.SHOW_MARKER_LINES,
     },
     ref
   ) => {
@@ -186,15 +181,13 @@ const RangeSlider = forwardRef(
         const leftValue = convertPositionToValue(leftPosition);
         const rightValue = convertPositionToValue(rightPosition);
 
-        if (snapsToStep) {
-          return [
-            Math.round(leftValue / step) * step,
-            Math.round(rightValue / step) * step,
-          ];
-        }
-        return [leftValue, rightValue];
+        // Always round values according to step size
+        return [
+          Math.round(leftValue / step) * step,
+          Math.round(rightValue / step) * step,
+        ];
       },
-      [convertPositionToValue, step, snapsToStep]
+      [convertPositionToValue, step]
     );
 
     const leftGesture = useAnimatedGestureHandler({
@@ -293,9 +286,6 @@ const RangeSlider = forwardRef(
       sliderWidth,
       markerSize,
       trackHeight,
-      markerColor,
-      selectedTrackColor,
-      unselectedTrackColor,
       enabled,
     });
 
@@ -306,12 +296,19 @@ const RangeSlider = forwardRef(
         <View
           style={[staticStyles.container, containerStyle, { direction: 'ltr' }]}
         >
-          <View style={[dynamicStyles.track, unselectedStyle]} />
+          <View
+            style={[
+              dynamicStyles.track,
+              { backgroundColor: '#CECECE' }, // Default color
+              unselectedTrackStyle,
+            ]}
+          />
 
           <Animated.View
             style={[
               dynamicStyles.selectedTrack,
-              selectedStyle,
+              { backgroundColor: '#2196F3' }, // Default color
+              selectedTrackStyle,
               animatedTrackStyle,
             ]}
           />
@@ -334,9 +331,13 @@ const RangeSlider = forwardRef(
                 leftMarkerStyle,
               ]}
             >
-              <View style={staticStyles.markerLine} />
-              <View style={staticStyles.markerLine} />
-              <View style={staticStyles.markerLine} />
+              {showMarkerLines && (
+                <>
+                  <View style={staticStyles.markerLine} />
+                  <View style={staticStyles.markerLine} />
+                  <View style={staticStyles.markerLine} />
+                </>
+              )}
             </Animated.View>
           </PanGestureHandler>
 
@@ -358,9 +359,13 @@ const RangeSlider = forwardRef(
                 rightMarkerStyle,
               ]}
             >
-              <View style={staticStyles.markerLine} />
-              <View style={staticStyles.markerLine} />
-              <View style={staticStyles.markerLine} />
+              {showMarkerLines && (
+                <>
+                  <View style={staticStyles.markerLine} />
+                  <View style={staticStyles.markerLine} />
+                  <View style={staticStyles.markerLine} />
+                </>
+              )}
             </Animated.View>
           </PanGestureHandler>
         </View>
@@ -404,8 +409,8 @@ RangeSlider.propTypes = {
   step: PropTypes.number,
 
   // Style props
-  selectedStyle: PropTypes.object,
-  unselectedStyle: PropTypes.object,
+  selectedTrackStyle: PropTypes.object,
+  unselectedTrackStyle: PropTypes.object,
   markerStyle: PropTypes.object,
   pressedMarkerStyle: PropTypes.object,
   containerStyle: PropTypes.object,
@@ -415,13 +420,9 @@ RangeSlider.propTypes = {
   markerSize: PropTypes.number,
   trackHeight: PropTypes.number,
   minimumDistance: PropTypes.number,
-  markerColor: PropTypes.string,
-  selectedTrackColor: PropTypes.string,
-  unselectedTrackColor: PropTypes.string,
 
   // Behavior props
   enabled: PropTypes.bool,
-  snapsToStep: PropTypes.bool,
   allowOverlap: PropTypes.bool,
 
   // Callback props
@@ -432,6 +433,9 @@ RangeSlider.propTypes = {
   // Accessibility props
   leftMarkerAccessibilityLabel: PropTypes.string,
   rightMarkerAccessibilityLabel: PropTypes.string,
+
+  // Marker lines prop
+  showMarkerLines: PropTypes.bool,
 };
 
 RangeSlider.defaultProps = {
@@ -440,16 +444,13 @@ RangeSlider.defaultProps = {
   markerSize: DEFAULT_VALUES.MARKER_SIZE,
   trackHeight: DEFAULT_VALUES.TRACK_HEIGHT,
   enabled: true,
-  snapsToStep: false,
   allowOverlap: false,
-  markerColor: DEFAULT_VALUES.MARKER_COLOR,
-  selectedTrackColor: DEFAULT_VALUES.SELECTED_TRACK_COLOR,
-  unselectedTrackColor: DEFAULT_VALUES.UNSELECTED_TRACK_COLOR,
   onValuesChange: () => {},
   onValuesChangeFinish: () => {},
   onValuesChangeStart: () => {},
   leftMarkerAccessibilityLabel: DEFAULT_VALUES.LEFT_MARKER_LABEL,
   rightMarkerAccessibilityLabel: DEFAULT_VALUES.RIGHT_MARKER_LABEL,
+  showMarkerLines: DEFAULT_VALUES.SHOW_MARKER_LINES,
 };
 
 export default RangeSlider;
