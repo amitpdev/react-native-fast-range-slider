@@ -10138,9 +10138,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-range-slider@workspace:.":
+"react-native-range-slider-fast@workspace:.":
   version: 0.0.0-use.local
-  resolution: "react-native-range-slider@workspace:."
+  resolution: "react-native-range-slider-fast@workspace:."
   dependencies:
     "@commitlint/config-conventional": ^19.6.0
     "@eslint/compat": ^1.2.7

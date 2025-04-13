@@ -1,6 +1,6 @@
-# React Native Range Slider
+# react-native-range-slider-fast
 
-A high-performance React Native range slider component built with [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated) and [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler) for smooth animations and precise touch control.
+A high-performance React Native range slider component built with [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated) and [react-native-gesture-handler](https://docs.swmansion.com/react-native-gesture-handler) for smooth animations and precise touch control. **Pure JavaScript implementation - no native code required.**
 
 ## Features
 
@@ -10,24 +10,27 @@ A high-performance React Native range slider component built with [react-native-
 - 🔄 Real-time value updates
 - 🎨 Fully customizable styling
 - ♿️ Accessibility support
-- 📱 Pure JavaScript implementation
+- 📱 Pure JavaScript implementation - no native code or linking needed
 - 🔧 Configurable min/max values and step sizes
-- 🎛 Support for minimum distance between markers
+- 🎛 Support for minimum distance between thumbs
 - 🌐 RTL (Right-to-Left) support
+- ⚡️ Works with Expo out of the box
 
 ## Performance Benefits
 
-This slider leverages two powerful libraries for optimal performance:
+This slider leverages two powerful libraries for optimal performance, while maintaining a pure JavaScript implementation:
 
 - **react-native-reanimated**: Runs animations directly on the UI thread, eliminating JS-bridge overhead and ensuring smooth 60 FPS animations even during complex interactions
 - **react-native-gesture-handler**: Provides native-driven gesture handling, resulting in more responsive touch interactions compared to React Native's PanResponder
 
+Both dependencies are widely adopted in the React Native ecosystem and don't require any additional native code configuration.
+
 ## Installation
 
 ```bash
-npm install react-native-range-slider
+npm install react-native-range-slider-fast
 # or
-yarn add react-native-range-slider
+yarn add react-native-range-slider-fast
 ```
 
 ### Dependencies
@@ -40,7 +43,7 @@ yarn add react-native-reanimated react-native-gesture-handler
 ## Usage
 
 ```javascript
-import RangeSlider from 'react-native-range-slider';
+import RangeSlider from 'react-native-range-slider-fast';
 
 const YourComponent = () => {
   const handleValuesChange = (values) => {
