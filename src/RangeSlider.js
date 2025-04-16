@@ -1,5 +1,11 @@
-import React, { useState, useCallback, forwardRef, useEffect } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import React, {
+  useState,
+  useCallback,
+  forwardRef,
+  useEffect,
+  useMemo,
+} from 'react';
+import { View, StyleSheet } from 'react-native';
 import {
   PanGestureHandler,
   GestureHandlerRootView,
@@ -13,14 +19,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import PropTypes from 'prop-types';
 
-// Layout constants
+// ================ Constants ================
 const HORIZONTAL_PADDING = 15;
 const TOUCH_HITSLOP = { top: 20, bottom: 20, left: 20, right: 20 };
 const MIN_THUMB_SPACING = 16;
 
-// Default values constants
 const DEFAULT_VALUES = {
-  SLIDER_WIDTH: 270,
+  WIDTH: 270,
   THUMB_SIZE: 32,
   TRACK_HEIGHT: 2.5,
   STEP: 1,
@@ -30,15 +35,45 @@ const DEFAULT_VALUES = {
   SHOW_THUMB_LINES: true,
 };
 
+// ================ Styles ================
+const styles = StyleSheet.create({
+  markerContainer: {
+    overflow: 'visible',
+  },
+});
+
+const staticStyles = StyleSheet.create({
+  container: {
+    height: 50,
+    justifyContent: 'center',
+    paddingHorizontal: HORIZONTAL_PADDING,
+  },
+  markerLine: {
+    width: 1,
+    height: 12,
+    backgroundColor: '#8E8E8E',
+    marginHorizontal: 2,
+  },
+  thumbInner: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 999,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+});
+
 const createDynamicStyles = (props) => ({
   root: {
-    width: props.sliderWidth + HORIZONTAL_PADDING * 2,
+    width: props.width + HORIZONTAL_PADDING * 2,
     alignSelf: 'center',
   },
   track: {
     position: 'absolute',
     height: props.trackHeight,
-    width: props.sliderWidth,
+    width: props.width,
     left: HORIZONTAL_PADDING,
   },
   selectedTrack: {
@@ -49,30 +84,26 @@ const createDynamicStyles = (props) => ({
     height: props.thumbSize,
     width: props.thumbSize,
     borderRadius: props.thumbSize / 2,
-    backgroundColor: 'white', // Move default color here
+    backgroundColor: 'white',
     position: 'absolute',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
     left: 0,
     top: '50%',
     marginTop: -(props.thumbSize / 2),
-    borderWidth: 0.5,
-    borderColor: '#CECECE',
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
     opacity: props.enabled ? 1 : 0.5,
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
   },
 });
 
+// ================ Component ================
 const RangeSlider = forwardRef(
   (
     {
       // Core props
-      values,
+      initialMinValue,
+      initialMaxValue,
       min,
       max,
       step = DEFAULT_VALUES.STEP,
@@ -83,9 +114,10 @@ const RangeSlider = forwardRef(
       thumbStyle,
       pressedThumbStyle,
       containerStyle,
+      selectedTrackColor,
 
       // Customization props
-      sliderWidth = DEFAULT_VALUES.SLIDER_WIDTH,
+      width = DEFAULT_VALUES.WIDTH, // Set default here
       thumbSize = DEFAULT_VALUES.THUMB_SIZE,
       trackHeight = DEFAULT_VALUES.TRACK_HEIGHT,
       minimumDistance = DEFAULT_VALUES.MINIMUM_DISTANCE,
@@ -108,31 +140,46 @@ const RangeSlider = forwardRef(
     },
     ref
   ) => {
+    // Track pressed state
     const [pressed, setPressed] = useState({ left: false, right: false });
 
+    // Memoize effective width calculation
+    const effectiveSliderWidth = useMemo(
+      () => width || DEFAULT_VALUES.WIDTH,
+      [width]
+    );
+
+    // Memoize initial values and positions
+    const initialPositions = useMemo(() => {
+      const leftValue = Math.max(min, Math.min(max, initialMinValue ?? min));
+      const rightValue = Math.max(min, Math.min(max, initialMaxValue ?? max));
+
+      const normalizedLeft = (leftValue - min) / (max - min);
+      const normalizedRight = (rightValue - min) / (max - min);
+
+      return {
+        left: HORIZONTAL_PADDING + normalizedLeft * effectiveSliderWidth,
+        right: HORIZONTAL_PADDING + normalizedRight * effectiveSliderWidth,
+      };
+    }, [min, max, initialMinValue, initialMaxValue, effectiveSliderWidth]);
+
+    // Initialize shared values with correct positions immediately
+    const leftPos = useSharedValue(initialPositions.left);
+    const rightPos = useSharedValue(initialPositions.right);
+    const leftOffset = useSharedValue(initialPositions.left);
+    const rightOffset = useSharedValue(initialPositions.right);
+
+    // For position calculations
     const calculatePosition = useCallback(
       (value) => {
         'worklet';
         const normalizedValue = (value - min) / (max - min);
-        return HORIZONTAL_PADDING + normalizedValue * sliderWidth;
+        const position =
+          HORIZONTAL_PADDING + normalizedValue * effectiveSliderWidth;
+        return position;
       },
-      [min, max, sliderWidth]
+      [min, max, effectiveSliderWidth]
     );
-
-    const leftPos = useSharedValue(0);
-    const rightPos = useSharedValue(0);
-    const leftOffset = useSharedValue(0);
-    const rightOffset = useSharedValue(0);
-
-    useEffect(() => {
-      const initialLeftPos = calculatePosition(values[0]);
-      const initialRightPos = calculatePosition(values[1]);
-
-      leftPos.value = initialLeftPos;
-      rightPos.value = initialRightPos;
-      leftOffset.value = initialLeftPos;
-      rightOffset.value = initialRightPos;
-    }, [calculatePosition, values, leftPos, rightPos, leftOffset, rightOffset]);
 
     const leftTransform = useDerivedValue(() => {
       'worklet';
@@ -168,11 +215,13 @@ const RangeSlider = forwardRef(
     const convertPositionToValue = useCallback(
       (position) => {
         'worklet';
-        return (
-          min + ((position - HORIZONTAL_PADDING) / sliderWidth) * (max - min)
-        );
+        const value =
+          min +
+          ((position - HORIZONTAL_PADDING) / effectiveSliderWidth) *
+            (max - min);
+        return value;
       },
-      [min, max, sliderWidth]
+      [min, max, effectiveSliderWidth]
     );
 
     const updateValues = useCallback(
@@ -180,14 +229,21 @@ const RangeSlider = forwardRef(
         'worklet';
         const leftValue = convertPositionToValue(leftPosition);
         const rightValue = convertPositionToValue(rightPosition);
-
-        // Always round values according to step size
-        return [
+        const rounded = [
           Math.round(leftValue / step) * step,
           Math.round(rightValue / step) * step,
         ];
+        return rounded;
       },
       [convertPositionToValue, step]
+    );
+
+    // Handle value changes
+    const updateOutputValues = useCallback(
+      (values) => {
+        onValuesChange(values);
+      },
+      [onValuesChange]
     );
 
     const leftGesture = useAnimatedGestureHandler({
@@ -195,6 +251,7 @@ const RangeSlider = forwardRef(
         'worklet';
         if (!enabled) return;
         ctx.startX = leftPos.value;
+        runOnJS(setPressed)({ left: true, right: false });
         runOnJS(onValuesChangeStart)(
           updateValues(leftPos.value, rightPos.value)
         );
@@ -213,14 +270,26 @@ const RangeSlider = forwardRef(
           minPosition,
           Math.min(maxPosition, position)
         );
+
+        // Update position directly without animation
         leftPos.value = clampedPosition;
-        runOnJS(onValuesChange)(updateValues(clampedPosition, rightPos.value));
+        leftOffset.value = clampedPosition;
+
+        const newValues = updateValues(clampedPosition, rightPos.value);
+        runOnJS(updateOutputValues)(newValues);
       },
       onEnd: () => {
         'worklet';
-        runOnJS(onValuesChangeFinish)(
-          updateValues(leftPos.value, rightPos.value)
-        );
+        if (!enabled) return;
+
+        const values = updateValues(leftPos.value, rightPos.value);
+        const leftValue = values[0];
+        const newLeftPos = calculatePosition(leftValue);
+
+        leftPos.value = newLeftPos;
+        leftOffset.value = newLeftPos;
+
+        runOnJS(onValuesChangeFinish)(values);
         runOnJS(setPressed)({ left: false, right: false });
       },
     });
@@ -230,6 +299,7 @@ const RangeSlider = forwardRef(
         'worklet';
         if (!enabled) return;
         ctx.startX = rightPos.value;
+        runOnJS(setPressed)({ left: false, right: true });
         runOnJS(onValuesChangeStart)(
           updateValues(leftPos.value, rightPos.value)
         );
@@ -242,48 +312,51 @@ const RangeSlider = forwardRef(
         const minPosition = allowOverlap
           ? leftPos.value
           : leftPos.value + minimumDistance;
-        const maxPosition = sliderWidth + HORIZONTAL_PADDING;
+        const maxPosition = effectiveSliderWidth + HORIZONTAL_PADDING;
 
         const clampedPosition = Math.max(
           minPosition,
           Math.min(maxPosition, position)
         );
+
+        // Update position directly without animation
         rightPos.value = clampedPosition;
-        runOnJS(onValuesChange)(updateValues(leftPos.value, clampedPosition));
+        rightOffset.value = clampedPosition;
+
+        const newValues = updateValues(leftPos.value, clampedPosition);
+        runOnJS(updateOutputValues)(newValues);
       },
       onEnd: () => {
         'worklet';
-        runOnJS(onValuesChangeFinish)(
-          updateValues(leftPos.value, rightPos.value)
-        );
+        if (!enabled) return;
+
+        const values = updateValues(leftPos.value, rightPos.value);
+        const rightValue = values[1];
+        const newRightPos = calculatePosition(rightValue);
+
+        rightPos.value = newRightPos;
+        rightOffset.value = newRightPos;
+
+        runOnJS(onValuesChangeFinish)(values);
         runOnJS(setPressed)({ left: false, right: false });
       },
     });
 
-    useEffect(() => {
+    const updatePositions = useCallback(() => {
       if (!pressed.left && !pressed.right) {
-        const newLeftPos = calculatePosition(values[0]);
-        const newRightPos = calculatePosition(values[1]);
-
-        leftPos.value = newLeftPos;
-        rightPos.value = newRightPos;
-        leftOffset.value = newLeftPos;
-        rightOffset.value = newRightPos;
+        leftPos.value = initialPositions.left;
+        rightPos.value = initialPositions.right;
+        leftOffset.value = initialPositions.left;
+        rightOffset.value = initialPositions.right;
       }
-    }, [
-      values,
-      min,
-      max,
-      pressed,
-      calculatePosition,
-      leftPos,
-      rightPos,
-      leftOffset,
-      rightOffset,
-    ]);
+    }, [pressed, initialPositions, leftPos, rightPos, leftOffset, rightOffset]);
+
+    useEffect(() => {
+      updatePositions();
+    }, [updatePositions]);
 
     const dynamicStyles = createDynamicStyles({
-      sliderWidth,
+      width: effectiveSliderWidth,
       thumbSize,
       trackHeight,
       enabled,
@@ -299,7 +372,7 @@ const RangeSlider = forwardRef(
           <View
             style={[
               dynamicStyles.track,
-              { backgroundColor: '#CECECE' }, // Default color
+              { backgroundColor: '#CECECE' },
               unselectedTrackStyle,
             ]}
           />
@@ -307,7 +380,9 @@ const RangeSlider = forwardRef(
           <Animated.View
             style={[
               dynamicStyles.selectedTrack,
-              { backgroundColor: '#2196F3' }, // Default color
+              {
+                backgroundColor: selectedTrackColor || '#2196F3',
+              },
               selectedTrackStyle,
               animatedTrackStyle,
             ]}
@@ -331,13 +406,15 @@ const RangeSlider = forwardRef(
                 leftThumbStyle,
               ]}
             >
-              {showThumbLines && (
-                <>
-                  <View style={staticStyles.markerLine} />
-                  <View style={staticStyles.markerLine} />
-                  <View style={staticStyles.markerLine} />
-                </>
-              )}
+              <View style={staticStyles.thumbInner}>
+                {showThumbLines && (
+                  <>
+                    <View style={staticStyles.markerLine} />
+                    <View style={staticStyles.markerLine} />
+                    <View style={staticStyles.markerLine} />
+                  </>
+                )}
+              </View>
             </Animated.View>
           </PanGestureHandler>
 
@@ -359,13 +436,15 @@ const RangeSlider = forwardRef(
                 rightThumbStyle,
               ]}
             >
-              {showThumbLines && (
-                <>
-                  <View style={staticStyles.markerLine} />
-                  <View style={staticStyles.markerLine} />
-                  <View style={staticStyles.markerLine} />
-                </>
-              )}
+              <View style={staticStyles.thumbInner}>
+                {showThumbLines && (
+                  <>
+                    <View style={staticStyles.markerLine} />
+                    <View style={staticStyles.markerLine} />
+                    <View style={staticStyles.markerLine} />
+                  </>
+                )}
+              </View>
             </Animated.View>
           </PanGestureHandler>
         </View>
@@ -374,36 +453,11 @@ const RangeSlider = forwardRef(
   }
 );
 
-const styles = StyleSheet.create({
-  markerContainer: {
-    ...Platform.select({
-      ios: {
-        zIndex: 1,
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
-  },
-});
-
-const staticStyles = StyleSheet.create({
-  container: {
-    height: 50,
-    justifyContent: 'center',
-    paddingHorizontal: HORIZONTAL_PADDING,
-  },
-  markerLine: {
-    width: 1,
-    height: 12,
-    backgroundColor: '#8E8E8E',
-    marginHorizontal: 2,
-  },
-});
-
+// ================ PropTypes & Defaults ================
 RangeSlider.propTypes = {
   // Core props
-  values: PropTypes.arrayOf(PropTypes.number).isRequired,
+  initialMinValue: PropTypes.number,
+  initialMaxValue: PropTypes.number,
   min: PropTypes.number.isRequired,
   max: PropTypes.number.isRequired,
   step: PropTypes.number,
@@ -414,9 +468,10 @@ RangeSlider.propTypes = {
   thumbStyle: PropTypes.object,
   pressedThumbStyle: PropTypes.object,
   containerStyle: PropTypes.object,
+  selectedTrackColor: PropTypes.string,
 
   // Customization props
-  sliderWidth: PropTypes.number,
+  width: PropTypes.number,
   thumbSize: PropTypes.number,
   trackHeight: PropTypes.number,
   minimumDistance: PropTypes.number,
@@ -440,9 +495,10 @@ RangeSlider.propTypes = {
 
 RangeSlider.defaultProps = {
   step: DEFAULT_VALUES.STEP,
-  sliderWidth: DEFAULT_VALUES.SLIDER_WIDTH,
+  width: DEFAULT_VALUES.WIDTH,
   thumbSize: DEFAULT_VALUES.THUMB_SIZE,
   trackHeight: DEFAULT_VALUES.TRACK_HEIGHT,
+  minimumDistance: DEFAULT_VALUES.MINIMUM_DISTANCE,
   enabled: true,
   allowOverlap: false,
   onValuesChange: () => {},

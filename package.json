@@ -45,13 +45,12 @@
     "ios",
     "android",
     "range-slider",
+    "multi-slider",
+    "dual-slider",
+    "dual",
+    "multi",
     "slider",
-    "range",
-    "reanimated",
-    "gesture-handler",
-    "performance",
-    "touch",
-    "interactive"
+    "range"
   ],
   "repository": {
     "type": "git",

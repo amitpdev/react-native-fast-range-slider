@@ -20,10 +20,38 @@ A high-performance React Native range slider component built with [react-native-
 
 This slider leverages two powerful libraries for optimal performance, while maintaining a pure JavaScript implementation:
 
-- **react-native-reanimated**: Runs animations directly on the UI thread, eliminating JS-bridge overhead and ensuring smooth 60 FPS animations even during complex interactions
+- **react-native-reanimated**: Runs animations directly on the UI thread, eliminating JS-bridge overhead and ensuring smooth 60 FPS animations
 - **react-native-gesture-handler**: Provides native-driven gesture handling, resulting in more responsive touch interactions compared to React Native's PanResponder
 
 Both dependencies are widely adopted in the React Native ecosystem and don't require any additional native code configuration.
+
+## Preview
+
+<table>
+  <tr>
+    <td><img width="200" src="assets/demo01.gif" alt="Range Slider Demo"></td>
+  </tr>
+</table>
+
+## Prerequisites
+
+This library requires [react-native-reanimated](https://www.npmjs.com/package/react-native-reanimated) and [react-native-gesture-handler](https://www.npmjs.com/package/react-native-gesture-handler).
+
+### Expo Users
+Both libraries are supported out of the box:
+```bash
+npx expo install react-native-reanimated react-native-gesture-handler
+```
+
+### React Native CLI Users
+1. Install the packages:
+```bash
+yarn add react-native-reanimated react-native-gesture-handler
+```
+
+2. Follow the additional setup instructions in:
+- [Reanimated Installation Guide](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started)
+- [Gesture Handler Installation Guide](https://docs.swmansion.com/react-native-gesture-handler/docs/fundamentals/installation)
 
 ## Installation
 
@@ -31,13 +59,6 @@ Both dependencies are widely adopted in the React Native ecosystem and don't req
 npm install react-native-range-slider-fast
 # or
 yarn add react-native-range-slider-fast
-```
-
-### Dependencies
-
-This library requires:
-```bash
-yarn add react-native-reanimated react-native-gesture-handler
 ```
 
 ## Usage
@@ -52,26 +73,31 @@ const YourComponent = () => {
 
   return (
     <RangeSlider
-      values={[20, 80]}
+      initialMinValue={20}
+      initialMaxValue={80}
       min={0}
       max={100}
       step={1}
       // Style customization
+      width={300}
+      thumbSize={32}
+      trackHeight={2.5}
       selectedTrackStyle={{ backgroundColor: '#2196F3' }}
       unselectedTrackStyle={{ backgroundColor: '#CECECE' }}
-      markerStyle={{ backgroundColor: 'white' }}
-      pressedMarkerStyle={{ transform: [{ scale: 1.2 }] }}
+      thumbStyle={{ backgroundColor: 'white' }}
+      pressedThumbStyle={{ transform: [{ scale: 1.2 }] }}
       // Behavior
       enabled={true}
       allowOverlap={false}
-      showMarkerLines={true}
+      showThumbLines={true}
+      minimumDistance={16}
       // Callbacks
       onValuesChange={handleValuesChange}
       onValuesChangeStart={(values) => console.log('Started:', values)}
       onValuesChangeFinish={(values) => console.log('Finished:', values)}
       // Accessibility
-      leftMarkerAccessibilityLabel="Minimum value"
-      rightMarkerAccessibilityLabel="Maximum value"
+      leftThumbAccessibilityLabel="Minimum value"
+      rightThumbAccessibilityLabel="Maximum value"
     />
   );
 };
@@ -81,25 +107,33 @@ const YourComponent = () => {
 
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| values | [number, number] | Yes | - | Current values array [min, max] |
+| **Core Props** |
 | min | number | Yes | - | Minimum allowed value |
 | max | number | Yes | - | Maximum allowed value |
+| initialMinValue | number | No | min | Initial minimum value |
+| initialMaxValue | number | No | max | Initial maximum value |
 | step | number | No | 1 | Step size for value changes |
-| sliderWidth | number | No | 270 | Width of the slider track |
+| **Customization Props** |
+| width | number | No | 270 | Width of the slider track |
 | thumbSize | number | No | 32 | Size of thumb handles |
 | trackHeight | number | No | 2.5 | Height of slider track |
 | minimumDistance | number | No | 16 | Minimum distance between thumbs |
-| enabled | boolean | No | true | Enable/disable slider |
-| allowOverlap | boolean | No | false | Allow thumbs to overlap |
 | showThumbLines | boolean | No | true | Show lines inside thumb handles |
+| **Style Props** |
 | selectedTrackStyle | object | No | - | Style object for selected track portion |
 | unselectedTrackStyle | object | No | - | Style object for unselected track portion |
 | thumbStyle | object | No | - | Style object for both thumbs |
 | pressedThumbStyle | object | No | - | Style applied when thumb is pressed |
 | containerStyle | object | No | - | Style for the container view |
+| selectedTrackColor | string | No | '#2196F3' | Color of the selected track portion |
+| **Behavior Props** |
+| enabled | boolean | No | true | Enable/disable slider |
+| allowOverlap | boolean | No | false | Allow thumbs to overlap |
+| **Callback Props** |
 | onValuesChange | function | No | () => {} | Called while dragging |
 | onValuesChangeStart | function | No | () => {} | Called when drag starts |
 | onValuesChangeFinish | function | No | () => {} | Called when drag ends |
+| **Accessibility Props** |
 | leftThumbAccessibilityLabel | string | No | "Left handle" | Accessibility label for left thumb |
 | rightThumbAccessibilityLabel | string | No | "Right handle" | Accessibility label for right thumb |
 
@@ -119,8 +153,8 @@ The component supports several style customization props:
     height: 4,
   }}
   
-  // Marker styles
-  markerStyle={{
+  // Thumb styles
+  thumbStyle={{
     backgroundColor: 'white',
     borderColor: '#CECECE',
     borderWidth: 0.5,
@@ -130,8 +164,8 @@ The component supports several style customization props:
     shadowRadius: 3.84,
   }}
   
-  // Pressed marker style
-  pressedMarkerStyle={{
+  // Pressed thumb style
+  pressedThumbStyle={{
     transform: [{ scale: 1.2 }],
   }}
   
@@ -140,8 +174,8 @@ The component supports several style customization props:
     height: 50,
   }}
   
-  // Show/hide marker lines
-  showMarkerLines={true}
+  // Show/hide thumb lines
+  showThumbLines={true}
 />
 ```
 
