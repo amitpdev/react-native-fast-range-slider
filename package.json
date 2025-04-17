@@ -1,6 +1,6 @@
 {
   "name": "react-native-fast-range-slider",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A high-performance React Native range slider with smooth animations and precise touch controls using react-native-reanimated",
   "source": "./src/index.tsx",
   "main": "./lib/module/index.js",
