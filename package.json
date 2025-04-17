@@ -65,16 +65,12 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
-  "dependencies": {
-    "prop-types": "^15.8.1",
-    "react-native-gesture-handler": "^2.15.0",
-    "react-native-reanimated": "^3.8.0"
-  },
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
     "react-native-gesture-handler": ">=2.0.0",
-    "react-native-reanimated": ">=3.0.0"
+    "react-native-reanimated": ">=3.0.0",
+    "prop-types": ">=15.0.0"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^19.6.0",
