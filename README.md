@@ -29,7 +29,7 @@ Both dependencies are widely adopted in the React Native ecosystem and don't req
 
 <table>
   <tr>
-    <td><img width="200" src="assets/demo01.gif" alt="Range Slider Demo"></td>
+    <td><img width="260" src="assets/demo01.gif" alt="Range Slider Demo"></td>
   </tr>
 </table>
 
