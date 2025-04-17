@@ -1,5 +1,5 @@
 {
-  "name": "react-native-range-slider-fast",
+  "name": "react-native-fast-range-slider",
   "version": "0.3.1",
   "description": "A high-performance React Native range slider with smooth animations and precise touch controls using react-native-reanimated",
   "source": "./src/index.tsx",
@@ -54,14 +54,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/amitpdev/react-native-range-slider-fast.git"
+    "url": "git+https://github.com/amitpdev/react-native-fast-range-slider.git"
   },
   "author": "Amit Palomo <apalgm@gmail.com> (https://github.com/amitpdev)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/amitpdev/react-native-range-slider-fast/issues"
+    "url": "https://github.com/amitpdev/react-native-fast-range-slider/issues"
   },
-  "homepage": "https://github.com/amitpdev/react-native-range-slider-fast#readme",
+  "homepage": "https://github.com/amitpdev/react-native-fast-range-slider#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

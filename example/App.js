@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-import RangeSlider from 'react-native-range-slider-fast';
+import RangeSlider from 'react-native-fast-range-slider';
 
 function App() {
   const MIN = 0;
