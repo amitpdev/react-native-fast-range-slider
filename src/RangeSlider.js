@@ -17,7 +17,6 @@ import Animated, {
   useDerivedValue,
   runOnJS,
 } from 'react-native-reanimated';
-import PropTypes from 'prop-types';
 
 // ================ Constants ================
 const HORIZONTAL_PADDING = 15;
@@ -452,61 +451,5 @@ const RangeSlider = forwardRef(
     );
   }
 );
-
-// ================ PropTypes & Defaults ================
-RangeSlider.propTypes = {
-  // Core props
-  initialMinValue: PropTypes.number,
-  initialMaxValue: PropTypes.number,
-  min: PropTypes.number.isRequired,
-  max: PropTypes.number.isRequired,
-  step: PropTypes.number,
-
-  // Style props
-  selectedTrackStyle: PropTypes.object,
-  unselectedTrackStyle: PropTypes.object,
-  thumbStyle: PropTypes.object,
-  pressedThumbStyle: PropTypes.object,
-  containerStyle: PropTypes.object,
-  selectedTrackColor: PropTypes.string,
-
-  // Customization props
-  width: PropTypes.number,
-  thumbSize: PropTypes.number,
-  trackHeight: PropTypes.number,
-  minimumDistance: PropTypes.number,
-
-  // Behavior props
-  enabled: PropTypes.bool,
-  allowOverlap: PropTypes.bool,
-
-  // Callback props
-  onValuesChange: PropTypes.func,
-  onValuesChangeFinish: PropTypes.func,
-  onValuesChangeStart: PropTypes.func,
-
-  // Accessibility props
-  leftThumbAccessibilityLabel: PropTypes.string,
-  rightThumbAccessibilityLabel: PropTypes.string,
-
-  // Visual props
-  showThumbLines: PropTypes.bool,
-};
-
-RangeSlider.defaultProps = {
-  step: DEFAULT_VALUES.STEP,
-  width: DEFAULT_VALUES.WIDTH,
-  thumbSize: DEFAULT_VALUES.THUMB_SIZE,
-  trackHeight: DEFAULT_VALUES.TRACK_HEIGHT,
-  minimumDistance: DEFAULT_VALUES.MINIMUM_DISTANCE,
-  enabled: true,
-  allowOverlap: false,
-  onValuesChange: () => {},
-  onValuesChangeFinish: () => {},
-  onValuesChangeStart: () => {},
-  leftThumbAccessibilityLabel: DEFAULT_VALUES.LEFT_THUMB_LABEL,
-  rightThumbAccessibilityLabel: DEFAULT_VALUES.RIGHT_THUMB_LABEL,
-  showThumbLines: DEFAULT_VALUES.SHOW_THUMB_LINES,
-};
 
 export default RangeSlider;

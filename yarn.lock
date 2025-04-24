@@ -10115,7 +10115,6 @@ __metadata:
     release-it: ^17.10.0
     typescript: ^5.2.2
   peerDependencies:
-    prop-types: ">=15.0.0"
     react: "*"
     react-native: "*"
     react-native-gesture-handler: ">=2.0.0"
