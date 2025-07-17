@@ -34,6 +34,7 @@ export interface RangeSliderProps {
   // Accessibility props
   leftThumbAccessibilityLabel?: string;
   rightThumbAccessibilityLabel?: string;
+  testID?: string;
 
   // Visual props
   showThumbLines?: boolean;
