@@ -4,17 +4,17 @@ A high-performance React Native range slider component built with [react-native-
 
 ## Features
 
-- 🚀 High performance using react-native-reanimated
-- 🎯 Precise touch controls with react-native-gesture-handler
-- 💨 Smooth animations running on UI thread
-- 🔄 Real-time value updates
-- 🎨 Fully customizable styling
-- ♿️ Accessibility support
-- 📱 Pure JavaScript implementation - no native code or linking needed
-- 🔧 Configurable min/max values and step sizes
-- 🎛 Support for minimum distance between thumbs
-- 🌐 RTL (Right-to-Left) support
-- ⚡️ Works with Expo out of the box
+- High performance using react-native-reanimated
+- Precise touch controls with react-native-gesture-handler
+- Smooth animations running on UI thread
+- Real-time value updates
+- Fully customizable styling
+- Accessibility support
+- Pure TypeScript implementation - no native code or linking needed
+- Configurable min/max values and step sizes
+- Support for minimum distance between thumbs
+- RTL (Right-to-Left) support
+- Works with Expo out of the box
 
 ## Performance Benefits
 

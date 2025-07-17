@@ -7,19 +7,15 @@ import {
   type ForwardRefRenderFunction,
 } from 'react';
 import { View, StyleSheet, type ViewStyle } from 'react-native';
-import {
-  PanGestureHandler,
-  GestureHandlerRootView,
-  type PanGestureHandlerGestureEvent,
-} from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   useDerivedValue,
   runOnJS,
   type SharedValue,
-  useAnimatedGestureHandler,
 } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import type { RangeSliderProps } from './types';
 
 // ================ Constants ================
@@ -54,11 +50,6 @@ interface InitialPositions {
 interface PressedState {
   left: boolean;
   right: boolean;
-}
-
-interface GestureContext {
-  startX: number;
-  [key: string]: unknown;
 }
 
 // ================ Styles ================
@@ -283,22 +274,19 @@ const RangeSlider: ForwardRefRenderFunction<View, RangeSliderProps> = (
     [onValuesChange]
   );
 
-  const leftGesture = useAnimatedGestureHandler<
-    PanGestureHandlerGestureEvent,
-    GestureContext
-  >({
-    onStart: (_: any, ctx: GestureContext) => {
+  const leftGesture = Gesture.Pan()
+    .hitSlop(TOUCH_HITSLOP)
+    .onStart(() => {
       'worklet';
       if (!enabled) return;
-      ctx.startX = leftPos.value;
       runOnJS(setPressed)({ left: true, right: false });
       runOnJS(onValuesChangeStart)(updateValues(leftPos.value, rightPos.value));
-    },
-    onActive: (event: any, ctx: GestureContext) => {
+    })
+    .onUpdate((event) => {
       'worklet';
       if (!enabled) return;
 
-      const position = ctx.startX + event.translationX;
+      const position = leftOffset.value + event.translationX;
       const minPosition = HORIZONTAL_PADDING;
       const maxPosition = allowOverlap
         ? rightPos.value
@@ -309,14 +297,12 @@ const RangeSlider: ForwardRefRenderFunction<View, RangeSliderProps> = (
         Math.min(maxPosition, position)
       );
 
-      // Update position directly without animation
       leftPos.value = clampedPosition;
-      leftOffset.value = clampedPosition;
 
       const newValues = updateValues(clampedPosition, rightPos.value);
       runOnJS(updateOutputValues)(newValues);
-    },
-    onEnd: () => {
+    })
+    .onEnd(() => {
       'worklet';
       if (!enabled) return;
 
@@ -329,25 +315,21 @@ const RangeSlider: ForwardRefRenderFunction<View, RangeSliderProps> = (
 
       runOnJS(onValuesChangeFinish)(values);
       runOnJS(setPressed)({ left: false, right: false });
-    },
-  });
+    });
 
-  const rightGesture = useAnimatedGestureHandler<
-    PanGestureHandlerGestureEvent,
-    GestureContext
-  >({
-    onStart: (_: any, ctx: GestureContext) => {
+  const rightGesture = Gesture.Pan()
+    .hitSlop(TOUCH_HITSLOP)
+    .onStart(() => {
       'worklet';
       if (!enabled) return;
-      ctx.startX = rightPos.value;
       runOnJS(setPressed)({ left: false, right: true });
       runOnJS(onValuesChangeStart)(updateValues(leftPos.value, rightPos.value));
-    },
-    onActive: (event: any, ctx: GestureContext) => {
+    })
+    .onUpdate((event) => {
       'worklet';
       if (!enabled) return;
 
-      const position = ctx.startX + event.translationX;
+      const position = rightOffset.value + event.translationX;
       const minPosition = allowOverlap
         ? leftPos.value
         : leftPos.value + minimumDistance;
@@ -358,14 +340,12 @@ const RangeSlider: ForwardRefRenderFunction<View, RangeSliderProps> = (
         Math.min(maxPosition, position)
       );
 
-      // Update position directly without animation
       rightPos.value = clampedPosition;
-      rightOffset.value = clampedPosition;
 
       const newValues = updateValues(leftPos.value, clampedPosition);
       runOnJS(updateOutputValues)(newValues);
-    },
-    onEnd: () => {
+    })
+    .onEnd(() => {
       'worklet';
       if (!enabled) return;
 
@@ -378,8 +358,7 @@ const RangeSlider: ForwardRefRenderFunction<View, RangeSliderProps> = (
 
       runOnJS(onValuesChangeFinish)(values);
       runOnJS(setPressed)({ left: false, right: false });
-    },
-  });
+    });
 
   // Update positions only when initial values change externally
   useEffect(() => {
@@ -427,65 +406,63 @@ const RangeSlider: ForwardRefRenderFunction<View, RangeSliderProps> = (
           ]}
         />
 
-        <PanGestureHandler
-          onGestureEvent={leftGesture}
-          hitSlop={TOUCH_HITSLOP}
-          minDist={0}
-          activeOffsetX={[-10, 10]}
+        <Animated.View
+          style={[
+            dynamicStyles.thumb,
+            styles.markerContainer,
+            thumbStyle,
+            pressed.left && pressedThumbStyle,
+            leftThumbStyle,
+          ]}
         >
-          <Animated.View
-            accessible={true}
-            accessibilityLabel={leftThumbAccessibilityLabel}
-            accessibilityRole="adjustable"
-            style={[
-              dynamicStyles.thumb,
-              styles.markerContainer,
-              thumbStyle,
-              pressed.left && pressedThumbStyle,
-              leftThumbStyle,
-            ]}
-          >
-            <View style={staticStyles.thumbInner}>
-              {showThumbLines && (
-                <>
-                  <View style={staticStyles.markerLine} />
-                  <View style={staticStyles.markerLine} />
-                  <View style={staticStyles.markerLine} />
-                </>
-              )}
-            </View>
-          </Animated.View>
-        </PanGestureHandler>
+          <GestureDetector gesture={leftGesture}>
+            <Animated.View
+              accessible={true}
+              accessibilityLabel={leftThumbAccessibilityLabel}
+              accessibilityRole="adjustable"
+              style={[{ width: '100%', height: '100%' }]}
+            >
+              <View style={staticStyles.thumbInner}>
+                {showThumbLines && (
+                  <>
+                    <View style={staticStyles.markerLine} />
+                    <View style={staticStyles.markerLine} />
+                    <View style={staticStyles.markerLine} />
+                  </>
+                )}
+              </View>
+            </Animated.View>
+          </GestureDetector>
+        </Animated.View>
 
-        <PanGestureHandler
-          onGestureEvent={rightGesture}
-          hitSlop={TOUCH_HITSLOP}
-          minDist={0}
-          activeOffsetX={[-10, 10]}
+        <Animated.View
+          style={[
+            dynamicStyles.thumb,
+            styles.markerContainer,
+            thumbStyle,
+            pressed.right && pressedThumbStyle,
+            rightThumbStyle,
+          ]}
         >
-          <Animated.View
-            accessible={true}
-            accessibilityLabel={rightThumbAccessibilityLabel}
-            accessibilityRole="adjustable"
-            style={[
-              dynamicStyles.thumb,
-              styles.markerContainer,
-              thumbStyle,
-              pressed.right && pressedThumbStyle,
-              rightThumbStyle,
-            ]}
-          >
-            <View style={staticStyles.thumbInner}>
-              {showThumbLines && (
-                <>
-                  <View style={staticStyles.markerLine} />
-                  <View style={staticStyles.markerLine} />
-                  <View style={staticStyles.markerLine} />
-                </>
-              )}
-            </View>
-          </Animated.View>
-        </PanGestureHandler>
+          <GestureDetector gesture={rightGesture}>
+            <Animated.View
+              accessible={true}
+              accessibilityLabel={rightThumbAccessibilityLabel}
+              accessibilityRole="adjustable"
+              style={[{ width: '100%', height: '100%' }]}
+            >
+              <View style={staticStyles.thumbInner}>
+                {showThumbLines && (
+                  <>
+                    <View style={staticStyles.markerLine} />
+                    <View style={staticStyles.markerLine} />
+                    <View style={staticStyles.markerLine} />
+                  </>
+                )}
+              </View>
+            </Animated.View>
+          </GestureDetector>
+        </Animated.View>
       </View>
     </GestureHandlerRootView>
   );
