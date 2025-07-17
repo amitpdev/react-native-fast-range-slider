@@ -341,18 +341,16 @@ const RangeSlider = forwardRef(
       },
     });
 
-    const updatePositions = useCallback(() => {
+    // Update positions only when initial values change externally
+    useEffect(() => {
+      // Only update if not currently being dragged
       if (!pressed.left && !pressed.right) {
         leftPos.value = initialPositions.left;
         rightPos.value = initialPositions.right;
         leftOffset.value = initialPositions.left;
         rightOffset.value = initialPositions.right;
       }
-    }, [pressed, initialPositions, leftPos, rightPos, leftOffset, rightOffset]);
-
-    useEffect(() => {
-      updatePositions();
-    }, [updatePositions]);
+    }, [initialMinValue, initialMaxValue]);
 
     const dynamicStyles = createDynamicStyles({
       width: effectiveSliderWidth,
