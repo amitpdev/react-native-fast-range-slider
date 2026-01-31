@@ -422,7 +422,7 @@ const RangeSlider: ForwardRefRenderFunction<View, RangeSliderProps> = (
               accessibilityRole="adjustable"
               style={[{ width: '100%', height: '100%' }]}
             >
-              <View style={staticStyles.thumbInner}>
+              <View style={[staticStyles.thumbInner, thumbStyle]}>
                 {showThumbLines && (
                   <>
                     <View style={staticStyles.markerLine} />
@@ -451,7 +451,7 @@ const RangeSlider: ForwardRefRenderFunction<View, RangeSliderProps> = (
               accessibilityRole="adjustable"
               style={[{ width: '100%', height: '100%' }]}
             >
-              <View style={staticStyles.thumbInner}>
+              <View style={[staticStyles.thumbInner, thumbStyle]}>
                 {showThumbLines && (
                   <>
                     <View style={staticStyles.markerLine} />
